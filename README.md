@@ -46,7 +46,7 @@ To run this application, your AWS environment must be configured with the follow
 
 1.  **Clone this repository to your App Server:**
     ```bash
-    git clone [https://github.com/your-username/AI-NGFW-Gateways-Latency-Testing.git](https://github.com/your-username/AI-NGFW-Gateways-Latency-Testing.git)
+    git clone [https://github.com/your-username/AI-NGFW-Gateways-Latency-Testing.git](https://github.com/chinthakaek/AI-NGFW-Gateways-Latency-Testing.git)
     cd AI-NGFW-Gateways-Latency-Testing
     ```
 
