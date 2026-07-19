@@ -58,7 +58,7 @@ To run this application, your AWS environment must be configured with the follow
 
 3.  **Run the application manually for testing:**
     ```bash
-    streamlit run appv2.py
+    streamlit run app.py
     ```
     *(Note: If you have configured this as a `systemd` service, you can manage it via `sudo systemctl start ngfw-tester`)*
 
@@ -84,4 +84,40 @@ Navigate to the **Analytics Dashboard** tab. The application will automatically 
 ---
 
 ## ⚠️ Important Configuration Notes
-If you push the *Max Generation Tokens* slider to a high value (e.g., 2048 tokens), you must manually edit the `appv2.py` script to increase the `boto3` `read_timeout` beyond 10 seconds. Otherwise, AWS Bedrock will exceed the local application timeout while generating the massive text payload, resulting in false failures.
+Current readtime out is set to 30 seconds for Cold requests and 60 seconds for warm requests. Depending on the Token size you may need to increase the timeout otherwise, AWS Bedrock will exceed the local application timeout while generating the massive text payload, resulting in false failures.
+
+```bash
+def get_bedrock_client(cold_conn):
+    if cold_conn:
+        config = Config(
+            region_name=aws_region, 
+            connect_timeout=3, 
+            read_timeout=30,        # <--- Update this for cold connections
+            max_pool_connections=1, 
+            retries={'max_attempts': 0}
+        )
+    else:
+        config = Config(
+            region_name=aws_region, 
+            connect_timeout=3, 
+            read_timeout=60,        # <--- Update this for warm connections
+            max_pool_connections=10, 
+            retries={'max_attempts': 3}
+        )
+    return boto3.client(service_name="bedrock-runtime", config=config)
+```
+
+Updating Max Tokens
+
+Streamlit enforces a strict rule: the default value must exactly align with the min_value plus a multiple of the step. Hence ensure to align the numbers when updating
+
+```bash
+max_tokens_val = st.sidebar.slider(
+    "Max Generation Tokens", 
+    min_value=20,          # <--- Aligned with the step and value
+    max_value=2048, 
+    value=20, 
+    step=20,
+    help="Higher values isolate application processing, while lower values isolate firewall infrastructure overhead."
+)
+```
