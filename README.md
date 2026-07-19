@@ -17,7 +17,7 @@ This application acts as a client generating API requests to AWS Bedrock (e.g., 
 *   **Warm vs. Cold Connection Profiling:** Toggle between pooled connections (to isolate Layer 7 AI inspection) and forced fresh handshakes (to measure SSL Forward Proxy certificate generation overhead).
 *   **Automated Executive Reporting:** One-click generation of a minimalist PDF report detailing raw stats, cleaned averages, and isolated processing overhead variances.
 *   **Raw Data Export:** Download complete unified logs (CSV) including the full model responses, exact prompts sent, and specific error termination reasons.
-
+*   **CSV Upload option:** Upload prompts as a CSV to do tests with randomized prompts. If the CSV contains 5 prompts and if you select to run 100, it will randomly repeat the prompts. 
 ---
 
 ## 🏗️ Architecture Overview
@@ -63,6 +63,7 @@ To run this application, your AWS environment must be configured with the follow
     *(Note: If you have configured this as a `systemd` service, you can manage it via `sudo systemctl start ngfw-tester`)*
 
 ---
+<img width="1836" height="1011" alt="image" src="https://github.com/user-attachments/assets/6bdb75f6-75e9-4754-8276-ae903295a289" />
 
 ## 🎮 How to Use
 
@@ -80,6 +81,8 @@ Navigate to the **Run Scenarios** tab. You must run the tests in order, manually
 
 ### 3. Analyze and Export
 Navigate to the **Analytics Dashboard** tab. The application will automatically display both the raw stats and the cleaned metrics (top 5% anomalies removed), calculate isolated latency deltas, and provide options to export raw CSV logs or download the minimalist PDF layout.
+
+<img width="1812" height="857" alt="image" src="https://github.com/user-attachments/assets/d3e9fb0e-9ff0-4664-9049-2a294929fd08" />
 
 ---
 
