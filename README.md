@@ -1,4 +1,4 @@
-# 🛡️ AI-NGFW Gateways Latency Testing
+# 🛡️ AI-NGFW Gateways Latency Test Tool
 ### *Palo Alto Networks AI-NGFW / AI-Gateway Latency Analyzer*
 
 Application for simulating prompts to capture the latency on AI NGFWs and AI Gateways.
