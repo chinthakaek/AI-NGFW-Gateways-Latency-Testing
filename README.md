@@ -87,6 +87,20 @@ Navigate to the **Analytics Dashboard** tab. The application will automatically 
 ---
 
 ## ⚠️ Important Configuration Notes
+
+Before running the tests, the certificates required for the firewall's SSL Forward Proxy must be added to the application server. If the client virtual machine does not trust the firewall's certificate, the Bedrock API requests will fail during the decryption scenarios.
+
+```bash
+Export and import the required certificate. (You can leverage SCP). Post that you can update the certificate store with the decryption certificate. 
+
+#copy the certificate to ubuntu cert store
+sudo cp sslcert.crt /usr/local/share/ca-certificates
+
+#Install the certificate
+sudo update-ca-certificates
+```
+
+
 Current readtime out is set to 30 seconds for Cold requests and 60 seconds for warm requests. Depending on the Token size you may need to increase the timeout otherwise, AWS Bedrock will exceed the local application timeout while generating the massive text payload, resulting in false failures.
 
 ```bash
