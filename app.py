@@ -2,7 +2,6 @@ import os
 import csv
 import json
 import time
-import random
 import tempfile
 from datetime import datetime
 import pandas as pd
@@ -55,7 +54,7 @@ cold_connection = (connection_type == "Cold (Force Fresh Handshake)")
 st.sidebar.markdown("---")
 st.sidebar.subheader("Prompt Configuration")
 
-prompt_mode = st.sidebar.radio("Prompt Input Mode", ("Single Static Prompt", "CSV Upload (Randomized)"))
+prompt_mode = st.sidebar.radio("Prompt Input Mode", ("Single Static Prompt", "CSV Upload (Sequential)"))
 
 # Initialize lists to hold prompts
 benign_prompts_list = []
@@ -306,11 +305,11 @@ with tab1:
             with open(CSV_FILENAME, "a", newline="") as f:
                 writer = csv.writer(f)
                 for idx in range(1, num_requests + 1):
-                    # Randomly select a prompt for this specific iteration
+                    # Sequentially select a prompt (loops back to top if requests > prompts)
                     if scenario_id == "UC4":
-                        current_prompt = random.choice(jailbreak_prompts_list)
+                        current_prompt = jailbreak_prompts_list[(idx - 1) % len(jailbreak_prompts_list)]
                     else:
-                        current_prompt = random.choice(benign_prompts_list)
+                        current_prompt = benign_prompts_list[(idx - 1) % len(benign_prompts_list)]
                         
                     if cold_connection: client = get_bedrock_client(True)
                     
