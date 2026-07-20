@@ -44,6 +44,7 @@ max_tokens_val = st.sidebar.slider(
 connection_type = st.sidebar.radio(
     "Connection Profile",
     ("Warm (Pooled Connections)", "Cold (Force Fresh Handshake)"),
+    index=1,
     help="Warm uses pooled connections to isolate L7 AI inspection. Cold closes sockets to measure SSL proxy cert generation overhead."
 )
 cold_connection = (connection_type == "Cold (Force Fresh Handshake)")
