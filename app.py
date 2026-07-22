@@ -292,7 +292,20 @@ with tab1:
     if (scenario_id in ["UC1", "UC2", "UC3"] and not benign_prompts_list) or (scenario_id == "UC4" and not jailbreak_prompts_list):
         st.error("⚠️ Please upload a valid CSV or switch to 'Single Static Prompt' in the sidebar before running.")
     else:
-        if st.button(f"Start Run: {scenario_id} ({num_requests} Requests)", type="primary"):
+        btn_col1, btn_col2 = st.columns([2, 1])
+        with btn_col1:
+            start_run_click = st.button(f"Start Run: {scenario_id} ({num_requests} Requests)", type="primary")
+        with btn_col2:
+            if os.path.exists(CSV_FILENAME):
+                check_df = pd.read_csv(CSV_FILENAME)
+                if not check_df.empty and scenario_id in check_df["Scenario"].values:
+                    if st.button(f"🗑️ Clear Existing {scenario_id} Data", type="secondary"):
+                        filtered_df = check_df[check_df["Scenario"] != scenario_id]
+                        filtered_df.to_csv(CSV_FILENAME, index=False)
+                        st.success(f"Cleared all records for {scenario_id}.")
+                        st.rerun()
+
+        if start_run_click:
             st.write("---")
             progress_bar = st.progress(0.0)
             status_text = st.empty()
@@ -342,8 +355,8 @@ with tab2:
     if os.path.exists(CSV_FILENAME):
         df = pd.read_csv(CSV_FILENAME)
         if len(df) > 1:
-            scenarios_present = df["Scenario"].unique()
-            selected_analytics = st.multiselect("Select Scenarios to Compare", options=scenarios_present, default=list(scenarios_present))
+            scenarios_present = list(df["Scenario"].unique())
+            selected_analytics = st.multiselect("Select Scenarios to Compare", options=scenarios_present, default=scenarios_present)
             df_filtered = df[df["Scenario"].isin(selected_analytics)].copy()
             
             if not df_filtered.empty:
@@ -380,7 +393,7 @@ with tab2:
                     c2.metric("Inline AI Inspection Overhead (Cleaned)", f"{ai_variance:.2f} ms")
                     
                     st.markdown("---")
-                    st.subheader("📥 Export Options")
+                    st.subheader("📥 Export & Database Operations")
                     col_a, col_b, col_c = st.columns(3)
                     
                     csv_raw = df_filtered.to_csv(index=False).encode('utf-8')
@@ -393,7 +406,15 @@ with tab2:
                         with col_b: st.error(f"Error generating PDF: {e}")
                     
                     with col_c:
-                        if st.button("🗑️ Clear Log Database", type="secondary"):
+                        uc_to_clear = st.selectbox("Select Scenario to Clear", options=scenarios_present, key="selective_clear_box")
+                        if st.button(f"🗑️ Clear {uc_to_clear} Data Only", type="secondary"):
+                            df_full = pd.read_csv(CSV_FILENAME)
+                            df_updated = df_full[df_full["Scenario"] != uc_to_clear]
+                            df_updated.to_csv(CSV_FILENAME, index=False)
+                            st.rerun()
+
+                        st.markdown("---")
+                        if st.button("🗑️ Clear Entire Database", type="secondary"):
                             try:
                                 os.remove(CSV_FILENAME)
                                 st.rerun()
