@@ -20,6 +20,27 @@ This application acts as a client generating API requests to AWS Bedrock (e.g., 
 *   **CSV Upload option:** Upload prompts as a CSV to do tests with randomized prompts. If the CSV contains 5 prompts and if you select to run 100, it will randomly repeat the prompts. 
 ---
 
+## 📁 Repository Structure & Application Versions
+
+Depending on your testing environment and the complexity of your evaluation, this repository offers three different versions of the Latency Test Tool. 
+
+### 1. `app.py` (Standard Version)
+The baseline empirical latency tester. This version is ideal for standard Generative AI traffic testing (UC1 to UC4) using standard AWS Bedrock models (like Claude 3 Haiku). It includes the core analytics dashboard, warm/cold connection profiling, and PDF report generation.
+
+### 2. `app-thinking.py` (Advanced Models & Prisma AIRS)
+This version introduces advanced payload handling and API integrations, designed for testing the absolute limits of Layer 7 firewall inspection.
+* **Extended Thinking Support:** Includes dynamic token math and API formatting to support "thinking" models (e.g., Claude 3.7 Sonnet). This forces the firewall to hold TCP connections open and inspect massive, hidden token streams before a final response is generated.
+* **Prisma AIRS API Integration (UC5):** Adds a 5th Use Case to test direct REST API intercepts using the Prisma AIRS API (`/v1/scan/sync/request`). 
+* **Sequential CSV Prompting:** Allows bulk uploading of Benign and Jailbreak prompts to simulate varied, real-world user traffic sequentially.
+* **Selective Database Management:** Allows clearing specific Use Case data from the database directly from the UI without wiping the entire log file.
+
+### 3. `appv3_multi-eni.py` (Automated "Zero-Commit" Architecture)
+The ultimate "Set-and-Forget" version. This script includes everything from `app-thinking.py`, but adds low-level socket binding to automate firewall routing. It eliminates the need to manually commit PAN-OS firewall rules between scenario runs.
+* **Dynamic Source IP Binding:** Maps specific Use Cases directly to specific secondary IPs (ENIs) on your Ubuntu server.
+* **Custom Socket Routing:** Uses custom `urllib3` connection patching for AWS `boto3` and custom `HTTPAdapters` for Prisma AIRS `requests` to force traffic out of the designated local interface.
+* **Zero-Touch Firewalling:** By pre-configuring your PAN-OS policies based on three distinct source IPs, you can run UC1 through UC5 back-to-back in seconds under identical network conditions without waiting for firewall commits.
+
+
 ## 🏗️ Architecture Overview
 
 This application is designed to be deployed on an AWS EC2 instance (Ubuntu) functioning as the Client App Server. 
